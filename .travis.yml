@@ -1,0 +1,40 @@
+language: cpp
+sudo: false
+deploy:
+  provider: s3
+  bucket: instant-meshes
+  region: eu-central-1
+  skip_cleanup: true
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  acl: public_read
+  local_dir: build
+matrix:
+  include:
+    - os: linux
+      compiler: gcc-4.8.1
+      script:
+        - git submodule update --init --recursive
+        - CXXFLAGS="-mno-rtm -DNANOVG_GL_NO_UNIFORMBUFFER=1" cmake -DCMAKE_CXX_COMPILER=g++-4.8
+        - make -j 2
+        - mkdir build
+        - zip -r build/instant-meshes-linux.zip "Instant Meshes"
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - kalakris-cmake
+          packages:
+            - g++-4.8
+            - libglu1-mesa-dev
+            - libxxf86vm-dev 
+            - cmake
+            - binutils
+    - os: osx
+      compiler: clang
+      script:
+        - git submodule update --init --recursive
+        - cmake .
+        - make -j 2
+        - mkdir build
+        - zip -r build/instant-meshes-macos.zip "Instant Meshes.app"

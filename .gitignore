@@ -1,0 +1,18 @@
+Makefile
+*.cmake
+.DS_Store
+ext_build
+build
+Release
+Debug
+CMakeCache.txt
+CMakeFiles
+.ninja_deps
+.ninja_log
+rules.ninja
+build.ninja
+Instant Meshes.app
+resources.cpp
+resources.h
+im
+datasets

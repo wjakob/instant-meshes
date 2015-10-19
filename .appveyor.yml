@@ -1,0 +1,30 @@
+version: 1.0.{build}
+os: Visual Studio 2015
+test: off
+clone_folder: C:\projects\InstantMeshes
+branches:
+  only:
+    - master
+install:
+  - git submodule update --init --recursive
+  - cinstall: python
+build_script:
+  - echo Running cmake...
+  - cd c:\projects\InstantMeshes
+  - cmake -G "Visual Studio 14 2015 Win64"
+  - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - set MSBuildOptions=/v:m /p:Configuration=Release /logger:%MSBuildLogger%
+  - msbuild %MSBuildOptions% InstantMeshes.sln
+  - cd Release
+  - 7z a ../instant-meshes-windows.zip "Instant Meshes.exe"
+  - cd ..
+  - appveyor PushArtifact instant-meshes-windows.zip -FileName instant-meshes-windows.zip
+deploy:
+  provider: S3
+  region: eu-central-1
+  access_key_id: AKIAJRIZYZRNQUXO7WZA
+  secret_access_key:
+    secure: Vy3I/MR5NtWDTXLbHcUzS6cwCSKZa/M8JYQZwHrip7cVW50Aez239OeqpC2je9yd
+  bucket: instant-meshes
+  set_public: true
+  folder: Release
