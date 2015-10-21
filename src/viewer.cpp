@@ -33,7 +33,7 @@
 Viewer::Viewer(bool fullscreen, bool deterministic)
     : Screen(Vector2i(1280, 960), "Instant Meshes", true, fullscreen),
       mOptimizer(mRes, true), mBVH(nullptr) {
-    framebufferSizeChanged();
+    resizeEvent(mSize[0], mSize[1]);
     mCreaseAngle = -1;
     mDeterministic = deterministic;
 
@@ -666,7 +666,7 @@ void Viewer::draw(NVGcontext *ctx) {
     Screen::draw(ctx);
 }
 
-void Viewer::framebufferSizeChanged() {
+bool Viewer::resizeEvent(int width, int height) {
     if (mFBO.ready())
         mFBO.free();
     int nSamples = 4;
@@ -679,6 +679,7 @@ void Viewer::framebufferSizeChanged() {
     mFBO.init(mFBSize, nSamples);
     mCamera.arcball.setSize(mSize);
     repaint();
+    return true;
 }
 
 void Viewer::setSymmetry(int rosy, int posy) {
@@ -880,7 +881,7 @@ bool Viewer::keyboardEvent(int key, int scancode, int event, int modifiers) {
             cout << "done. (took " << timeString(timer.value()) << ")" << endl;
             mFBO.download("screenshot.tga");
             glViewport(0, 0, mFBSize[0], mFBSize[1]);
-            framebufferSizeChanged();
+            resizeEvent(mSize[0], mSize[1]);
         } else if (key == 'M') {
             renderMitsuba();
         } else if (key == 'F') {

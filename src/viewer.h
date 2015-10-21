@@ -91,7 +91,7 @@ protected:
     void drawContents();
     void drawOverlay();
 
-    void framebufferSizeChanged();
+    bool resizeEvent(int width, int height);
 
     void refreshColors();
 
