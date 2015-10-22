@@ -105,7 +105,14 @@ include_directories(
 )
 
 # Run bin2c on resource files
-set(PNG_FILES  "resources/comb.png;resources/delete_stroke.png;resources/loadmesh.png;resources/scare.png;resources/sing_dir.png;resources/sing_pos.png;resources/instantmeshes.png" )
+set(PNG_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/comb.png
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/delete_stroke.png
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/loadmesh.png
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/scare.png
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/sing_dir.png
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/sing_pos.png
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/instantmeshes.png)
 file(GLOB FRAG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.frag")
 file(GLOB VERT_FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.vert")
 file(GLOB GEO_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.geo")
