@@ -109,8 +109,6 @@ int main(int argc, char **argv) {
                 dominant = true;
             } else if (strcmp("--compat", argv[i]) == 0 || strcmp("-C", argv[i]) == 0) {
                 compat = true;
-            } else if (strcmp("--stream", argv[i]) == 0 || strcmp("-X", argv[i]) == 0) {
-                //__stream_everything = true; // XXX
 #if defined(__APPLE__)
             } else if (strncmp("-psn", argv[i], 4) == 0) {
                 launched_from_finder = true;
@@ -161,7 +159,6 @@ int main(int argc, char **argv) {
         cout << "   -v, --vertices <count>    Desired vertex count of the output mesh" << endl;
         cout << "   -C, --compat              Compatibility mode to load snapshots from old software versions" << endl;
         cout << "   -k, --knn <count>         Point cloud mode: number of adjacent points to consider" << endl;
-        cout << "   -X, --stream              Stream really huge input to the GPU instead of uploading it" << endl;
         cout << "   -F, --fullscreen          Open a full-screen window" << endl;
         cout << "   -h, --help                Display this message" << endl;
         return -1;
