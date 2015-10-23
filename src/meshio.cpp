@@ -482,7 +482,7 @@ void load_pointcloud(const std::string &filename, MatrixXf &V, MatrixXf &N,
         fetch_string(filename_sub);
         MatrixXu F_sub;
         MatrixXf V_sub, N_sub;
-        load_ply(std::string(path_dir) + "/" + filename_sub, F_sub, V_sub, false);
+        load_ply(std::string(path_dir) + "/" + filename_sub, F_sub, V_sub);
         Eigen::Matrix<Float, 4, 4> M;
         for (uint32_t k=0; k<16; ++k)
             fetch_float(M.data()[k]);
