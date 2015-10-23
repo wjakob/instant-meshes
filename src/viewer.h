@@ -91,7 +91,7 @@ protected:
     void drawContents();
     void drawOverlay();
 
-    bool resizeEvent(int width, int height);
+    bool resizeEvent(const Vector2i &size);
 
     void refreshColors();
 
