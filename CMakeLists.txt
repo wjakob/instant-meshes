@@ -116,25 +116,22 @@ set(PNG_FILES
 file(GLOB FRAG_FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.frag")
 file(GLOB VERT_FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.vert")
 file(GLOB GEO_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.geo")
-set(BIN2C_CMDLINE resources.cpp resources.h)
-foreach(file ${PNG_FILES} ${FRAG_FILES} ${VERT_FILES} ${GEO_FILES})
-  list(APPEND BIN2C_CMDLINE ${file})
-endforeach()
+set(IM_RESOURCES ${PNG_FILES} ${FRAG_FILES} ${VERT_FILES} ${GEO_FILES})
+
+add_custom_command(
+  OUTPUT resources.cpp
+  COMMAND bin2c ARGS resources.cpp resources.h ${IM_RESOURCES}
+  DEPENDS bin2c ${IM_RESOURCES}
+  COMMENT "Running bin2c"
+  PRE_BUILD VERBATIM)
 
 set(EXTRA_SOURCE "")
 if (APPLE)
   set(EXTRA_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/resources/im.icns")
 endif()
 
-add_custom_command(
-  OUTPUT resources.cpp resources.h
-  COMMAND bin2c ARGS ${BIN2C_CMDLINE}
-  DEPENDS bin2c ${resources}
-  COMMENT "Running bin2c"
-  PRE_BUILD VERBATIM)
-
 add_executable(InstantMeshes MACOSX_BUNDLE
-  resources.h resources.cpp
+  resources.cpp
   src/glutil.h src/glutil.cpp
   src/widgets.h src/widgets.cpp
   src/aabb.h
