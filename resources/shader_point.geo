@@ -21,8 +21,8 @@ out fData {
 	vec3 to_light;
 	vec3 normal;
 	vec2 texcoord;
-	vec2 texcoord_point;
 	vec4 color;
+	vec2 texcoord_point;
 } frag;
 
 const vec2 corners[4] = vec2[](vec2(0.0, 1.0), vec2(0.0, 0.0), vec2(1.0, 1.0), vec2(1.0, 0.0));

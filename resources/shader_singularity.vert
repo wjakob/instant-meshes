@@ -9,8 +9,7 @@ in vec3 color;
 out vData {
 	vec3 color;
 	vec3 normal;
-	vec3 dir1;
-	vec3 dir2;
+	vec3 dir1, dir2;
 } vertex;
 
 void main() {

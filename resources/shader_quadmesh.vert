@@ -7,8 +7,8 @@ in vec3 position;
 in vec3 normal;
 
 out fData {
-	vec3 to_light;
 	vec3 to_eye;
+	vec3 to_light;
 	vec3 normal;
 } frag;
 
