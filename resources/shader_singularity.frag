@@ -2,8 +2,8 @@
 precision lowp float;
 
 in fData {
-	vec2 texcoord;
 	vec3 color;
+	vec2 texcoord;
 	vec2 dir1, dir2;
 } frag;
 
