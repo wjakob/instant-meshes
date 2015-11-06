@@ -16,3 +16,8 @@ resources.cpp
 resources.h
 im
 datasets
+.vs
+*.vcxproj
+*.filters
+*.sdf
+*.sln
