@@ -17,6 +17,15 @@
 #include <thread>
 #include <cstdlib>
 
+#if defined(_WIN32)
+/* Force usage of discrete GPU on laptops */
+extern "C"
+{
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+    __declspec(dllexport) int NvOptimusEnablement = 1;
+}
+#endif
+
 int nprocs = -1;
 
 int main(int argc, char **argv) {
