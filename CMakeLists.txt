@@ -15,6 +15,11 @@ if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/glfw")
     "by calling \"git submodule update --init --recursive\"")
 endif()
 
+# Enable folders for projects in Visual Studio
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif()
+
 # Sanitize build environment for static build with C++11
 if (MSVC)
   add_definitions (/D "_CRT_SECURE_NO_WARNINGS")
@@ -69,6 +74,8 @@ set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_SHARED  OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_PYTHON  OFF CACHE BOOL " " FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui ext_build/nanogui)
+set_property(TARGET nanogui glfw glfw_objects bin2c PROPERTY FOLDER "dependencies")
+
 
 # Build TBB
 set(TBB_BUILD_STATIC ON CACHE BOOL " " FORCE)
@@ -76,6 +83,8 @@ set(TBB_BUILD_SHARED OFF CACHE BOOL " " FORCE)
 set(TBB_BUILD_TBBMALLOC OFF CACHE BOOL " " FORCE)
 set(TBB_BUILD_TBBMALLOC_PROXY OFF CACHE BOOL " " FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/tbb ext_build/tbb)
+set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
+
 
 include_directories(
   # Eigen
@@ -128,6 +137,8 @@ add_custom_command(
 set(EXTRA_SOURCE "")
 if (APPLE)
   set(EXTRA_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/resources/im.icns")
+elseif(WIN32)
+  set(EXTRA_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/resources/im.rc")
 endif()
 
 add_executable(InstantMeshes MACOSX_BUNDLE
