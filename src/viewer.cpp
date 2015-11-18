@@ -620,8 +620,26 @@ Viewer::Viewer(bool fullscreen, bool deterministic)
 #ifdef VISUALIZE_ERROR
     mGraph = new Graph(window, "Energy");
 #endif
+    Button *about = new Button(window->buttonPanel(), "", ENTYPO_ICON_INFO);
+    about->setCallback([&,ctx]() {
+        auto dlg = new MessageDialog(
+            this, MessageDialog::Type::Information, "About Instant Meshes",
+            "Instant Meshes is freely available under a BSD-style license. "
+            "If you use the meshes obtained with this software, we kindly "
+            "request that you acknowledge this and link to the project page at\n\n"
+            "\thttp://igl.ethz.ch/projects/instant-meshes/\n\n"
+            "In the context of scientific articles or books, please cite paper\n\n"
+            "Instant Field-Aligned Meshes\n"
+            "Wenzel Jakob, Marco Tarini, Daniele Panozzo, Olga Sorkine-Hornung\n"
+            "In ACM Transactions on Graphics (Proceedings of SIGGRAPH Asia 2015)\n");
+        dlg->messageLabel()->setFixedWidth(550);
+        dlg->messageLabel()->setFontSize(20);
+        performLayout(ctx);
+        dlg->center();
+    });
 
     performLayout(ctx);
+
     mProgress = std::bind(&Viewer::showProgress, this, _1, _2);
     mOperationStart = mLastProgressMessage = glfwGetTime();
     resetState();
@@ -1861,7 +1879,7 @@ void Viewer::refreshColors() {
                 //compute_curl(mRes, curl);
                 //jet(curl, C);
             }
-            
+
             break;
     }
     for (auto &c : mCreaseMap)
