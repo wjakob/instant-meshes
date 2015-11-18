@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8.3)
 project(InstantMeshes)
 
+option(INSTANT_MESHES_DEV_MODE "Instant meshes developer mode" OFF)
+
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -76,7 +78,6 @@ set(NANOGUI_BUILD_PYTHON  OFF CACHE BOOL " " FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui ext_build/nanogui)
 set_property(TARGET nanogui glfw glfw_objects bin2c PROPERTY FOLDER "dependencies")
 
-
 # Build TBB
 set(TBB_BUILD_STATIC ON CACHE BOOL " " FORCE)
 set(TBB_BUILD_SHARED OFF CACHE BOOL " " FORCE)
@@ -85,7 +86,7 @@ set(TBB_BUILD_TBBMALLOC_PROXY OFF CACHE BOOL " " FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/tbb ext_build/tbb)
 set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 
-
+# Header file directories of dependency libraries
 include_directories(
   # Eigen
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/eigen
@@ -134,6 +135,11 @@ add_custom_command(
   COMMENT "Running bin2c"
   PRE_BUILD VERBATIM)
 
+if (INSTANT_MESHES_DEV_MODE)
+  add_definitions(-DDEV_MODE)
+endif()
+
+# Resource file (icons etc.)
 set(EXTRA_SOURCE "")
 if (APPLE)
   set(EXTRA_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/resources/im.icns")

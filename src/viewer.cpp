@@ -897,7 +897,7 @@ bool Viewer::keyboardEvent(int key, int scancode, int event, int modifiers) {
             while (mNeedsRepaint)
                 drawContents();
             cout << "done. (took " << timeString(timer.value()) << ")" << endl;
-            mFBO.download("screenshot.tga");
+            mFBO.downloadTGA("screenshot.tga");
             glViewport(0, 0, mFBSize[0], mFBSize[1]);
             resizeEvent(mSize);
         } else if (key == 'M') {
