@@ -23,8 +23,8 @@ load_mesh_or_pointcloud(const std::string &filename, MatrixXu &F,
 extern void load_obj(const std::string &filename, MatrixXu &F, MatrixXf &V,
                      const ProgressCallback &progress = ProgressCallback());
 
-extern void load_ply(const std::string &filename, MatrixXu &F, MatrixXf &V,
-                     bool load_faces = true,
+extern void load_ply(const std::string &filename, MatrixXu &F, MatrixXf &V, 
+                     MatrixXf &N, bool load_faces = true,
                      const ProgressCallback &progress = ProgressCallback());
 
 extern void
