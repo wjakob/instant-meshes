@@ -17,14 +17,8 @@
 #include <thread>
 #include <cstdlib>
 
-#if defined(_WIN32)
 /* Force usage of discrete GPU on laptops */
-extern "C"
-{
-    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-    __declspec(dllexport) int NvOptimusEnablement = 1;
-}
-#endif
+NANOGUI_FORCE_DISCRETE_GPU();
 
 int nprocs = -1;
 
@@ -220,7 +214,7 @@ int main(int argc, char **argv) {
         nanogui::shutdown();
     } catch (const std::runtime_error &e) {
         std::string error_msg = std::string("Caught a fatal error: ") + std::string(e.what());
-        #if defined(WIN32)
+        #if defined(_WIN32)
             MessageBoxA(nullptr, error_msg.c_str(), NULL, MB_ICONERROR | MB_OK);
         #else
             std::cerr << error_msg << endl;

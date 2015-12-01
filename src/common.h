@@ -13,7 +13,7 @@
 
 #pragma once
 
-#if defined(WIN32)
+#if defined(_WIN32)
     #define NOMINMAX
     #pragma warning(disable: 4244 4018 4100 4610 4510 4127 4512 4146 4267 4503 4800 4706)
 #endif
@@ -90,7 +90,7 @@ typedef std::function<void(const std::string &, Float)> ProgressCallback;
     }
 
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #define RCPOVERFLOW_FLT   2.93873587705571876e-39f
 #define RCPOVERFLOW_DBL   5.56268464626800345e-309
 #else
@@ -173,7 +173,7 @@ template <typename Matrix> inline size_t sizeInBytes(const Matrix &matrix) {
 }
 
 inline bool atomicCompareAndExchange(volatile uint32_t *v, uint32_t newValue, uint32_t oldValue) {
-#if defined(WIN32)
+#if defined(_WIN32)
     return _InterlockedCompareExchange(
         reinterpret_cast<volatile long *>(v), (long) newValue, (long) oldValue) == (long) oldValue;
 #else

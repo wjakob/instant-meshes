@@ -15,7 +15,7 @@
 #include "normal.h"
 #include <unordered_map>
 #include <fstream>
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <libgen.h>
 #endif
 
@@ -494,7 +494,7 @@ void load_pointcloud(const std::string &filename, MatrixXf &V, MatrixXf &N,
     uint32_t nFiles;
     fetch_uint(nFiles);
 
-#if defined(WIN32)
+#if defined(_WIN32)
     char path_drive[_MAX_DRIVE];
     char path_dir[_MAX_DIR];
     char path_fname[_MAX_FNAME];

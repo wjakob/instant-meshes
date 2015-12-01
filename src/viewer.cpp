@@ -25,7 +25,7 @@
 #include <pcg32.h>
 #include <fstream>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #  include <unistd.h>
 #  include <sys/wait.h>
 #endif
@@ -1385,7 +1385,7 @@ void Viewer::renderMitsuba() {
        << "\t</sensor>" << endl
        << "</scene>" << endl;
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
     pid_t pid = fork(); /* Create a child process */
     if (pid == -1) {
         throw std::runtime_error("Internal error!");
