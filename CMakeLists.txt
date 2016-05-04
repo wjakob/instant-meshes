@@ -89,16 +89,10 @@ set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 
 # Header file directories of dependency libraries
 include_directories(
-  # Eigen
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/eigen
-  # GLFW
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/glfw/include
-  # GLEW
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/glew/include
-  # NanoVG
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/nanovg/src
   # NanoGUI
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/include
+  # NanoGUI dependencies (Eigen, GLFW, NanoVG, GLAD?)
+  ${NANOGUI_EXTRA_INCS}
   # Intel Thread Building Blocks
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/tbb/include
   # Disjoint set data structure
@@ -173,6 +167,7 @@ add_executable(InstantMeshes MACOSX_BUNDLE
   ext/rply/rply.c
   ${EXTRA_SOURCE})
 
+add_definitions(${NANOGUI_EXTRA_DEFS})
 target_link_libraries(InstantMeshes tbb_static nanogui ${NANOGUI_EXTRA_LIBS})
 
 set_target_properties(InstantMeshes PROPERTIES OUTPUT_NAME "Instant Meshes")
