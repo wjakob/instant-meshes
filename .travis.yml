@@ -15,7 +15,7 @@ matrix:
       compiler: gcc-4.8.1
       script:
         - git submodule update --init --recursive
-        - CXXFLAGS="-mno-rtm -DNANOVG_GL_NO_UNIFORMBUFFER=1" cmake -DCMAKE_CXX_COMPILER=g++-4.8
+        - CXXFLAGS="-mno-rtm" cmake -DNANOGUI_USE_GLAD=ON -DCMAKE_CXX_COMPILER=g++-4.8
         - make -j 2
         - mkdir build
         - zip -r build/instant-meshes-linux.zip "Instant Meshes"
