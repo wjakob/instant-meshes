@@ -268,7 +268,7 @@ protected:
 
 inline std::string str_tolower(std::string str) {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    return std::move(str);
+    return str;
 }
 
 inline uint32_t str_to_uint32_t(const std::string &str) {
