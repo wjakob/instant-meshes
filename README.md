@@ -31,6 +31,8 @@ or ``Instant Meshes.exe``.
 
 > [Datasets](https://s3.eu-central-1.amazonaws.com/instant-meshes/instant-meshes-datasets.zip)
 
+Note: On Linux, Instant Meshes relies on the program ``zenity``, which must be installed.
+
 ## Compiling
 
 Compiling from scratch requires CMake and a recent version of XCode on Mac,
