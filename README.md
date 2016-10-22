@@ -33,15 +33,19 @@ or ``Instant Meshes.exe``.
 
 ## Compiling
 
-Compiling from scratch requires CMake and a recent version of XCode on Mac, Visual Studio 2015
-on Windows, and GCC on Linux.
+Compiling from scratch requires CMake and a recent version of XCode on Mac,
+Visual Studio 2015 on Windows, and GCC on Linux. 
 
-On Linux and MacOS, compiling should be as simple as
+On MacOS, compiling should be as simple as
 
     git clone --recursive https://github.com/wjakob/instant-meshes
     cd instant-meshes
     cmake .
     make -j 4
+
+To build on Linux, please install the prerequisites ``libxrand-dev``,
+``libxinerama-dev``, ``xcursor-dev``, and ``libxi-dev`` and then use the
+same sequence of commands shown above for MacOS.
 
 On Windows, open the generated file ``InstantMeshes.sln`` after step 3 and proceed building as usual from within Visual Studio.
 
