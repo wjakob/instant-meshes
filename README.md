@@ -21,15 +21,15 @@ This repository contains the interactive meshing software developed as part of t
 
 The following binaries (Intel, 64 bit) are automatically generated from the latest GitHub revision.
 
-> [Microsoft Windows](https://s3.eu-central-1.amazonaws.com/instant-meshes/Release/instant-meshes-windows.zip)<br/>
-> [Mac OS X](https://s3.eu-central-1.amazonaws.com/instant-meshes/instant-meshes-macos.zip)<br/>
-> [Linux](https://s3.eu-central-1.amazonaws.com/instant-meshes/instant-meshes-linux.zip)
+> [Microsoft Windows](https://instant-meshes.s3.eu-central-1.amazonaws.com/Release/instant-meshes-windows.zip)<br/>
+> [Mac OS X](https://instant-meshes.s3.eu-central-1.amazonaws.com/instant-meshes-macos.zip)<br/>
+> [Linux](https://instant-meshes.s3.eu-central-1.amazonaws.com/instant-meshes-linux.zip)
 
 Please also fetch the following dataset ZIP file and extract it so that the
 ``datasets`` folder is in the same directory as ``Instant Meshes``, ``Instant Meshes.app``,
 or ``Instant Meshes.exe``.
 
-> [Datasets](https://s3.eu-central-1.amazonaws.com/instant-meshes/instant-meshes-datasets.zip)
+> [Datasets](https://instant-meshes.s3.eu-central-1.amazonaws.com/instant-meshes-datasets.zip)
 
 Note: On Linux, Instant Meshes relies on the program ``zenity``, which must be installed.
 
