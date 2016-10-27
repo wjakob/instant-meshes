@@ -45,8 +45,8 @@ On MacOS, compiling should be as simple as
     cmake .
     make -j 4
 
-To build on Linux, please install the prerequisites ``libxrand-dev``,
-``libxinerama-dev``, ``xcursor-dev``, and ``libxi-dev`` and then use the
+To build on Linux, please install the prerequisites ``libxrandr-dev``,
+``libxinerama-dev``, ``libxcursor-dev``, and ``libxi-dev`` and then use the
 same sequence of commands shown above for MacOS.
 
 On Windows, open the generated file ``InstantMeshes.sln`` after step 3 and proceed building as usual from within Visual Studio.
