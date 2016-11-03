@@ -300,13 +300,18 @@ void write_ply(const std::string &filename, const MatrixXu &F,
 
     for (auto item : irregular) {
         auto face = item.second;
-        uint32_t v = face.second.begin()->first, first = v;
+        uint32_t v = face.second.begin()->first, first = v, i = 0;
         ply_write(ply, face.second.size());
         while (true) {
             ply_write(ply, v);
             v = face.second[v];
-            if (v == first)
+            ++i;
+            if (v == first || i == face.second.size())
                 break;
+        }
+        while (i != face.second.size()) {
+            ply_write(ply, v);
+            ++i;
         }
         if (Nf.size() > 0) {
             for (uint32_t i=0; i<Nf.rows(); ++i)
@@ -590,7 +595,7 @@ void write_obj(const std::string &filename, const MatrixXu &F,
 
     for (auto item : irregular) {
         auto face = item.second;
-        uint32_t v = face.second.begin()->first, first = v;
+        uint32_t v = face.second.begin()->first, first = v, i = 0;
         os << "f ";
         while (true) {
             uint32_t idx = v + 1;
@@ -600,7 +605,7 @@ void write_obj(const std::string &filename, const MatrixXu &F,
             os << "//" << idx << " ";
 
             v = face.second[v];
-            if (v == first)
+            if (v == first || ++i == face.second.size())
                 break;
         }
         os << endl;
