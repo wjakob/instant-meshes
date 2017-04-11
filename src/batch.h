@@ -15,7 +15,14 @@
 
 #include "common.h"
 
-extern void batch_process(const std::string &input, const std::string &output,
+struct Mesh
+{
+    MatrixXu F; ///< Faces. F.rows() is 3 for triangles, 4 for quads. Empty if point cloud.
+    MatrixXf V; ///< V.cols() == number of vertices. V.rows() == 3.
+    MatrixXf N; ///< Vertex normals. V.cols() = N.cols(). N.rows() == 3.
+};
+
+extern Mesh batch_process(const Mesh& mesh,
                           int rosy, int posy, Float scale, int face_count,
                           int vertex_count, Float creaseAngle, bool extrinsic,
                           bool align_to_boundaries, int smooth_iter,

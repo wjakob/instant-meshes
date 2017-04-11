@@ -22,15 +22,13 @@
 #include "extract.h"
 #include "bvh.h"
 
-void batch_process(const std::string &input, const std::string &output,
+Mesh batch_process(const Mesh& in_mesh,
                    int rosy, int posy, Float scale, int face_count,
                    int vertex_count, Float creaseAngle, bool extrinsic,
                    bool align_to_boundaries, int smooth_iter, int knn_points,
                    bool pure_quad, bool deterministic) {
     cout << endl;
     cout << "Running in batch mode:" << endl;
-    cout << "   Input file             = " << input << endl;
-    cout << "   Output file            = " << output << endl;
     cout << "   Rotation symmetry type = " << rosy << endl;
     cout << "   Position symmetry type = " << (posy==3?6:posy) << endl;
     cout << "   Crease angle threshold = ";
@@ -53,8 +51,9 @@ void batch_process(const std::string &input, const std::string &output,
     BVH *bvh = nullptr;
     AdjacencyMatrix adj = nullptr;
 
-    /* Load the input mesh */
-    load_mesh_or_pointcloud(input, F, V, N);
+    F = in_mesh.F;
+    V = in_mesh.V;
+    N = in_mesh.N;
 
     bool pointcloud = F.size() == 0;
 
@@ -190,7 +189,7 @@ void batch_process(const std::string &input, const std::string &output,
     optimizer.notify();
     optimizer.wait();
     cout << "done. (took " << timeString(timer.reset()) << ")" << endl;
-    
+
     //std::map<uint32_t, Vector2i> pos_sing;
     //compute_position_singularities(mRes, sing, pos_sing, extrinsic, rosy, posy);
     //cout << "Position field has " << pos_sing.size() << " singularities." << endl;
@@ -208,7 +207,8 @@ void batch_process(const std::string &input, const std::string &output,
             mRes.scale(), crease_out, true, pure_quad, bvh, smooth_iter);
     cout << "Extraction is done. (total time: " << timeString(timer.reset()) << ")" << endl;
 
-    write_mesh(output, F_extr, O_extr, MatrixXf(), Nf_extr);
     if (bvh)
         delete bvh;
+
+    return {F_extr, O_extr, Nf_extr};
 }
