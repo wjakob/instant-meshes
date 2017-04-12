@@ -27,23 +27,6 @@ Mesh batch_process(const Mesh& in_mesh,
                    int vertex_count, Float creaseAngle, bool extrinsic,
                    bool align_to_boundaries, int smooth_iter, int knn_points,
                    bool pure_quad, bool deterministic) {
-    cout << endl;
-    cout << "Running in batch mode:" << endl;
-    cout << "   Rotation symmetry type = " << rosy << endl;
-    cout << "   Position symmetry type = " << (posy==3?6:posy) << endl;
-    cout << "   Crease angle threshold = ";
-    if (creaseAngle > 0)
-        cout << creaseAngle << endl;
-    else
-        cout << "disabled" << endl;
-    cout << "   Extrinsic mode         = " << (extrinsic ? "enabled" : "disabled") << endl;
-    cout << "   Align to boundaries    = " << (align_to_boundaries ? "yes" : "no") << endl;
-    cout << "   kNN points             = " << knn_points << " (only applies to point clouds)"<< endl;
-    cout << "   Fully deterministic    = " << (deterministic ? "yes" : "no") << endl;
-    if (posy == 4)
-        cout << "   Output mode            = " << (pure_quad ? "pure quad mesh" : "quad-dominant mesh") << endl;
-    cout << endl;
-
     MatrixXu F;
     MatrixXf V, N;
     VectorXf A;
@@ -69,8 +52,6 @@ Mesh batch_process(const Mesh& in_mesh,
     }
 
     if (scale < 0 && vertex_count < 0 && face_count < 0) {
-        cout << "No target vertex count/face count/scale argument provided. "
-                "Setting to the default of 1/16 * input vertex count." << endl;
         vertex_count = V.cols() / 16;
     }
 
@@ -88,11 +69,6 @@ Mesh batch_process(const Mesh& in_mesh,
         scale = posy == 4 ? std::sqrt(face_area) : (2*std::sqrt(face_area * std::sqrt(1.f/3.f)));
     }
 
-    cout << "Output mesh goals (approximate)" << endl;
-    cout << "   Vertex count           = " << vertex_count << endl;
-    cout << "   Face count             = " << face_count << endl;
-    cout << "   Edge length            = " << scale << endl;
-
     MultiResolutionHierarchy mRes;
 
     if (!pointcloud) {
@@ -100,9 +76,6 @@ Mesh batch_process(const Mesh& in_mesh,
         VectorXu V2E, E2E;
         VectorXb boundary, nonManifold;
         if (stats.mMaximumEdgeLength*2 > scale || stats.mMaximumEdgeLength > stats.mAverageEdgeLength * 2) {
-            cout << "Input mesh is too coarse for the desired output edge length "
-                    "(max input mesh edge length=" << stats.mMaximumEdgeLength
-                 << "), subdividing .." << endl;
             build_dedge(F, V, V2E, E2E, boundary, nonManifold);
             subdivide(F, V, V2E, E2E, boundary, nonManifold, std::min(scale/2, (Float) stats.mAverageEdgeLength*2), deterministic);
         }
@@ -163,36 +136,25 @@ Mesh batch_process(const Mesh& in_mesh,
         bvh->build();
     }
 
-    cout << "Preprocessing is done. (total time excluding file I/O: "
-         << timeString(timer.reset()) << ")" << endl;
-
     Optimizer optimizer(mRes, false);
     optimizer.setRoSy(rosy);
     optimizer.setPoSy(posy);
     optimizer.setExtrinsic(extrinsic);
 
-    cout << "Optimizing orientation field .. ";
-    cout.flush();
     optimizer.optimizeOrientations(-1);
     optimizer.notify();
     optimizer.wait();
-    cout << "done. (took " << timeString(timer.reset()) << ")" << endl;
 
     std::map<uint32_t, uint32_t> sing;
     compute_orientation_singularities(mRes, sing, extrinsic, rosy);
-    cout << "Orientation field has " << sing.size() << " singularities." << endl;
     timer.reset();
 
-    cout << "Optimizing position field .. ";
-    cout.flush();
     optimizer.optimizePositions(-1);
     optimizer.notify();
     optimizer.wait();
-    cout << "done. (took " << timeString(timer.reset()) << ")" << endl;
 
     //std::map<uint32_t, Vector2i> pos_sing;
     //compute_position_singularities(mRes, sing, pos_sing, extrinsic, rosy, posy);
-    //cout << "Position field has " << pos_sing.size() << " singularities." << endl;
     //timer.reset();
 
     optimizer.shutdown();
@@ -205,7 +167,6 @@ Mesh batch_process(const Mesh& in_mesh,
     MatrixXu F_extr;
     extract_faces(adj_extr, O_extr, N_extr, Nf_extr, F_extr, posy,
             mRes.scale(), crease_out, true, pure_quad, bvh, smooth_iter);
-    cout << "Extraction is done. (total time: " << timeString(timer.reset()) << ")" << endl;
 
     if (bvh)
         delete bvh;

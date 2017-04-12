@@ -21,8 +21,6 @@ MeshStats compute_mesh_stats(const MatrixXu &F, const MatrixXf &V,
     Timer<> timer;
     MeshStats stats;
     if (F.size() != 0) {
-        cout << "Computing mesh statistics .. ";
-        cout.flush();
         auto map = [&](const tbb::blocked_range<uint32_t> &range, MeshStats stats) -> MeshStats {
             for (uint32_t f = range.begin(); f != range.end(); ++f) {
                 Vector3f v[3] = { V.col(F(0, f)), V.col(F(1, f)), V.col(F(2, f)) };
@@ -49,7 +47,7 @@ MeshStats compute_mesh_stats(const MatrixXu &F, const MatrixXf &V,
             MeshStats result;
             result.mSurfaceArea = s0.mSurfaceArea + s1.mSurfaceArea;
             result.mWeightedCenter = s0.mWeightedCenter + s1.mWeightedCenter;
-            result.mAverageEdgeLength = 
+            result.mAverageEdgeLength =
                 s0.mAverageEdgeLength + s1.mAverageEdgeLength;
             result.mMaximumEdgeLength =
                 std::max(s0.mMaximumEdgeLength, s1.mMaximumEdgeLength);
@@ -67,8 +65,6 @@ MeshStats compute_mesh_stats(const MatrixXu &F, const MatrixXf &V,
         stats.mAverageEdgeLength /= F.cols() * 3;
         stats.mWeightedCenter /= stats.mSurfaceArea;
     } else {
-        cout << "Computing point cloud statistics .. ";
-        cout.flush();
         auto map = [&](const tbb::blocked_range<uint32_t> &range, MeshStats stats) -> MeshStats {
             for (uint32_t i = range.begin(); i != range.end(); ++i) {
                 const Vector3f &v = V.col(i);
@@ -97,8 +93,6 @@ MeshStats compute_mesh_stats(const MatrixXu &F, const MatrixXf &V,
         stats.mWeightedCenter /= V.cols();
     }
 
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
-
     return stats;
 }
 
@@ -108,8 +102,6 @@ void compute_dual_vertex_areas(const MatrixXu &F, const MatrixXf &V,
                                  const ProgressCallback &progress) {
     A.resize(V.cols());
     A.setZero();
-    cout << "Computing dual vertex areas .. ";
-    cout.flush();
     Timer<> timer;
 
     tbb::parallel_for(
@@ -121,7 +113,7 @@ void compute_dual_vertex_areas(const MatrixXu &F, const MatrixXf &V,
                     continue;
                 Float vertex_area = 0;
                 do {
-                    uint32_t ep = dedge_prev_3(edge), en = dedge_next_3(edge); 
+                    uint32_t ep = dedge_prev_3(edge), en = dedge_next_3(edge);
 
                     Vector3f v = V.col(F(edge%3, edge/3));
                     Vector3f vn = V.col(F(en%3, en/3));
@@ -146,6 +138,4 @@ void compute_dual_vertex_areas(const MatrixXu &F, const MatrixXf &V,
             SHOW_PROGRESS_RANGE(range, V.cols(), "Computing dual vertex areas");
         }
     );
-
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
 }

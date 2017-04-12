@@ -25,8 +25,6 @@ AdjacencyMatrix generate_adjacency_matrix_uniform(
     const MatrixXu &F, const VectorXu &V2E, const VectorXu &E2E,
     const VectorXb &nonManifold, const ProgressCallback &progress) {
     VectorXu neighborhoodSize(V2E.size() + 1);
-    cout << "Generating adjacency matrix .. ";
-    cout.flush();
     Timer<> timer;
 
     tbb::parallel_for(
@@ -92,7 +90,6 @@ AdjacencyMatrix generate_adjacency_matrix_uniform(
         }
     );
 
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
 
     return adj;
 }
@@ -103,8 +100,6 @@ generate_adjacency_matrix_cotan(const MatrixXu &F, const MatrixXf &V,
                                 const VectorXb &nonManifold,
                                 const ProgressCallback &progress) {
     VectorXu neighborhoodSize(V2E.size() + 1);
-    cout << "Computing cotangent Laplacian .. ";
-    cout.flush();
     Timer<> timer;
 
     tbb::parallel_for(
@@ -214,7 +209,6 @@ generate_adjacency_matrix_cotan(const MatrixXu &F, const MatrixXf &V,
             SHOW_PROGRESS_RANGE(range, V.cols(), "Computing cotangent Laplacian (2/2)");
         }
     );
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
     return adj;
 }
 
@@ -222,8 +216,6 @@ AdjacencyMatrix generate_adjacency_matrix_pointcloud(
     MatrixXf &V, MatrixXf &N, const BVH *bvh, MeshStats &stats, uint32_t knn_points,
     bool deterministic, const ProgressCallback &progress) {
     Timer<> timer;
-    cout << "Generating adjacency matrix .. ";
-    cout.flush();
 
     stats.mAverageEdgeLength = bvh->diskRadius();
     const Float maxQueryRadius = bvh->diskRadius() * 3;
@@ -286,8 +278,6 @@ AdjacencyMatrix generate_adjacency_matrix_pointcloud(
         nLinks += adj_size[i];
     }
 
-    cout << "allocating " << memString(sizeof(Link) * nLinks) << " .. ";
-    cout.flush();
 
     AdjacencyMatrix adj = new Link*[V.size() + 1];
     adj[0] = new Link[nLinks];
@@ -334,6 +324,5 @@ AdjacencyMatrix generate_adjacency_matrix_pointcloud(
        reasonably accurate) */
     stats.mSurfaceArea = M_PI * stats.mAverageEdgeLength*stats.mAverageEdgeLength * 0.5f * V.cols();
 
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
     return adj;
 }

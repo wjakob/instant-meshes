@@ -301,9 +301,6 @@ void BVH::build(const ProgressCallback &progress) {
         throw std::runtime_error("BVH Node is not packed! Investigate compiler settings.");
 #endif
 
-    cout << "Constructing Bounding Volume Hierarchy .. ";
-    cout.flush();
-
     bool pointcloud = mF->size() == 0;
     uint32_t total_size = pointcloud ? mV->cols() : mF->cols();
 
@@ -318,16 +315,6 @@ void BVH::build(const ProgressCallback &progress) {
     delete[] temp;
 
     std::pair<Float, uint32_t> stats = statistics();
-    cout << "done. ("
-         << "SAH cost = " << stats.first << ", "
-         << "nodes = " << stats.second << ", "
-         << "took " << timeString(timer.reset())
-         << ")" << endl;
-
-    cout.precision(4);
-    cout << "Compressing BVH node storage to "
-         << 100 * stats.second / (float) mNodes.size() << "% of its original size .. ";
-    cout.flush();
 
     std::vector<BVHNode> compressed(stats.second);
     std::vector<uint32_t> skipped_accum(mNodes.size());
@@ -348,12 +335,7 @@ void BVH::build(const ProgressCallback &progress) {
 
     mNodes = std::move(compressed);
 
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
-
     if (pointcloud) {
-        cout << "Assigning disk radius .. ";
-        cout.flush();
-
         auto map = [&](const tbb::blocked_range<uint32_t> &range, double radius_sum) -> double {
             std::vector<std::pair<Float, uint32_t>> result;
             for (uint32_t i = range.begin(); i < range.end(); ++i) {
@@ -374,7 +356,6 @@ void BVH::build(const ProgressCallback &progress) {
         mDiskRadius = tbb::parallel_deterministic_reduce(range, 0, map, reduce) / (double) range.size();
         mDiskRadius *= 3;
         refitBoundingBoxes();
-        cout << "done. (took " << timeString(timer.value()) << ")" << endl;
     }
 
     mProgress = nullptr;

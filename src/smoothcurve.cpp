@@ -22,13 +22,10 @@
 bool smooth_curve(const BVH *bvh, const VectorXu &E2E, std::vector<CurvePoint> &curve, bool watertight) {
     const MatrixXu &F = *bvh->F();
     const MatrixXf &V = *bvh->V(), &N = *bvh->N();
-    cout << endl;
 
     std::vector<CurvePoint> curve_new;
     std::vector<Float> weight;
     std::vector<uint32_t> path;
-
-    cout << "Input: " << curve.size() << " vertices" << endl;
 
     for (int it=0;; ++it) {
         if (curve.size() < 2)
@@ -148,7 +145,6 @@ bool smooth_curve(const BVH *bvh, const VectorXu &E2E, std::vector<CurvePoint> &
         if (it > 2)
             break;
     }
-    cout << "Smoothed curve: " << curve.size() << " vertices" << endl;
 
     return true;
 }

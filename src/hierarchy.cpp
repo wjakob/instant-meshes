@@ -36,8 +36,6 @@ AdjacencyMatrix downsample_graph(const AdjacencyMatrix adj, const MatrixXf &V,
     uint32_t nLinks = adj[V.cols()] - adj[0];
     Entry *entries = new Entry[nLinks];
     Timer<> timer;
-    cout << "  Collapsing .. ";
-    cout.flush();
 
     tbb::parallel_for(
         tbb::blocked_range<uint32_t>(0u, (uint32_t) V.cols(), GRAIN_SIZE),
@@ -201,8 +199,6 @@ AdjacencyMatrix downsample_graph(const AdjacencyMatrix adj, const MatrixXf &V,
             SHOW_PROGRESS_RANGE(range, V_p.cols(), "Downsampling graph (6/6)");
         }
     );
-    cout << "done. (" << V.cols() << " -> " << V_p.cols() << " vertices, took "
-         << timeString(timer.value()) << ")" << endl;
     return adj_p;
 }
 
@@ -212,8 +208,6 @@ void generate_graph_coloring_deterministic(const AdjacencyMatrix &adj, uint32_t 
     if (progress)
         progress("Graph coloring", 0.0f);
     phases.clear();
-    cout << "    Coloring .. ";
-    cout.flush();
     Timer<> timer;
 
     std::vector<uint32_t> perm(size);
@@ -262,8 +256,6 @@ void generate_graph_coloring_deterministic(const AdjacencyMatrix &adj, uint32_t 
     for (uint32_t i=0; i<size; ++i)
         phases[color[i]].push_back(i);
 
-    cout << "done. (" << phases.size() << " colors, took "
-         << timeString(timer.value()) << ")" << endl;
 }
 
 void generate_graph_coloring(const AdjacencyMatrix &adj, uint32_t size,
@@ -279,8 +271,6 @@ void generate_graph_coloring(const AdjacencyMatrix &adj, uint32_t size,
     if (progress)
         progress("Graph coloring", 0.0f);
     phases.clear();
-    cout << "    Coloring .. ";
-    cout.flush();
 
     Timer<> timer;
 
@@ -384,9 +374,6 @@ void generate_graph_coloring(const AdjacencyMatrix &adj, uint32_t size,
 
     for (uint32_t i=0; i<size; ++i)
         phases[color[i]].push_back(i);
-
-    cout << "done. (" << phases.size() << " colors, took "
-         << timeString(timer.value()) << ")" << endl;
 }
 
 MultiResolutionHierarchy::MultiResolutionHierarchy() {
@@ -412,20 +399,18 @@ MultiResolutionHierarchy::MultiResolutionHierarchy() {
 
 void MultiResolutionHierarchy::build(bool deterministic, const ProgressCallback &progress) {
     std::vector<std::vector<uint32_t>> phases;
-    cout << "Processing level 0 .." << endl;
     if (deterministic)
         generate_graph_coloring_deterministic(mAdj[0], mV[0].cols(), phases, progress);
     else
         generate_graph_coloring(mAdj[0], mV[0].cols(), phases, progress);
     mPhases.push_back(phases);
-    
+
     mTotalSize = mV[0].cols();
     mCO.push_back(MatrixXf());
     mCOw.push_back(VectorXf());
     mCQ.push_back(MatrixXf());
     mCQw.push_back(VectorXf());
 
-    cout << "Building multiresolution hierarchy .." << endl;
     Timer<> timer;
     for (int i=0; i<MAX_DEPTH; ++i) {
         std::vector<std::vector<uint32_t>> phases_p;
@@ -460,7 +445,6 @@ void MultiResolutionHierarchy::build(bool deterministic, const ProgressCallback 
     }
     mIterationsQ = mIterationsO = -1;
     mFrozenO = mFrozenQ = false;
-    cout << "Hierarchy construction took " << timeString(timer.value()) << "." << endl;
 }
 
 void init_random_tangent(const MatrixXf &N, MatrixXf &Q) {
@@ -497,8 +481,6 @@ void init_random_position(const MatrixXf &P, const MatrixXf &N, MatrixXf &O, Flo
 }
 
 void MultiResolutionHierarchy::resetSolution() {
-    cout << "Setting to random solution .. ";
-    cout.flush();
     Timer<> timer;
     if (mQ.size() != mV.size()) {
         mQ.resize(mV.size());
@@ -509,7 +491,6 @@ void MultiResolutionHierarchy::resetSolution() {
         init_random_position(mV[i], mN[i], mO[i], mScale);
     }
     mFrozenO = mFrozenQ = false;
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
 }
 
 void MultiResolutionHierarchy::free() {
@@ -662,8 +643,6 @@ void MultiResolutionHierarchy::load(const Serializer &serializer) {
 void MultiResolutionHierarchy::clearConstraints() {
     if (levels() == 0)
         return;
-    if (mCQ[0].size() == 0)
-        cout << "Allocating memory for constraints .." << endl;
     for (int i=0; i<levels(); ++i) {
         mCQ[i].resize(3, size(i));
         mCO[i].resize(3, size(i));
@@ -685,8 +664,6 @@ void MultiResolutionHierarchy::propagateSolution(int rosy) {
     else
         throw std::runtime_error("Unsupported symmetry!");
 
-    cout << "Propagating updated solution.. ";
-    cout.flush();
     Timer<> timer;
     for (int l=0; l<levels()-1; ++l)  {
         const MatrixXf &N = mN[l];
@@ -721,14 +698,11 @@ void MultiResolutionHierarchy::propagateSolution(int rosy) {
             }
         );
     }
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
 }
 
 void MultiResolutionHierarchy::propagateConstraints(int rosy, int posy) {
     if (levels() == 0)
         return;
-    cout << "Propagating constraints .. ";
-    cout.flush();
     Timer<> timer;
 
     auto compat_orient = compat_orientation_extrinsic_2;
@@ -804,7 +778,7 @@ void MultiResolutionHierarchy::propagateConstraints(int rosy, int posy) {
                         cow = COw[upper[1]];
                     } else if (has_co1 && has_co0) {
                         auto result = compat_pos(
-                            V.col(upper[0]), N.col(upper[0]), CQ.col(upper[0]), CO.col(upper[0]), 
+                            V.col(upper[0]), N.col(upper[0]), CQ.col(upper[0]), CO.col(upper[0]),
                             V.col(upper[1]), N.col(upper[1]), CQ.col(upper[1]), CO.col(upper[1]),
                             scale, inv_scale
                         );
@@ -833,7 +807,6 @@ void MultiResolutionHierarchy::propagateConstraints(int rosy, int posy) {
             }
         );
     }
-    cout << "done. (took " << timeString(timer.value()) << ")" << endl;
 }
 
 void MultiResolutionHierarchy::printStatistics() const {
