@@ -4,7 +4,7 @@ This is a clone of https://github.com/wjakob/instant-meshes modified to make it 
 Usage:
 
 ```
-git clone --recursive "https://github.com/Volumental/instant-meshes" instant_meshes
+git clone --recursive "git@github.com:Volumental/instant-meshes.git" instant_meshes
 cd instant_meshes
 mkdir -p build
 cd build
