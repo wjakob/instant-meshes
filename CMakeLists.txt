@@ -128,6 +128,8 @@ else()
   #set_target_properties(instant_meshes PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++")
 endif()
 
+target_link_libraries(instant_meshes tbb)
+
 install(TARGETS instant_meshes
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
