@@ -1,4 +1,5 @@
 language: cpp
+dist: trusty
 sudo: false
 deploy:
   provider: s3
@@ -28,6 +29,10 @@ matrix:
             - g++-4.8
             - libglu1-mesa-dev
             - libxxf86vm-dev 
+            - libxrandr-dev
+            - libxinerama-dev
+            - libxcursor-dev
+            - libxi-dev
             - cmake
             - binutils
     - os: osx

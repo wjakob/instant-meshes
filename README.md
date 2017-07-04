@@ -13,6 +13,13 @@ This repository contains the interactive meshing software developed as part of t
 > [Video](https://www.youtube.com/watch?v=U6wtw6W4x3I),
 > [Project page](http://igl.ethz.ch/projects/instant-meshes/)
 
+
+##### In commercial software
+
+Since version 10.2, Modo uses the Instant Meshes algorithm to implement its
+automatic retopology feature. An interview discussing this technique and more
+recent projects is available [here](https://www.foundry.com/trends/design-visualisation/mitsuba-renderer-instant-meshes).
+
 ## Screenshot
 
 ![Instant Meshes logo](https://github.com/wjakob/instant-meshes/raw/master/resources/screenshot.jpg)
@@ -50,7 +57,6 @@ To build on Linux, please install the prerequisites ``libxrandr-dev``,
 same sequence of commands shown above for MacOS.
 
 On Windows, open the generated file ``InstantMeshes.sln`` after step 3 and proceed building as usual from within Visual Studio.
-
 
 ## Usage
 
