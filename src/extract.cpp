@@ -806,15 +806,24 @@ void extract_faces(std::vector<std::vector<TaggedLink> > &adj, MatrixXf &O,
                 idx_ecs[j] = idx_ec;
             }
 
+            bool first = true;
             for (uint32_t j=0; j<4; ++j) {
                 uint32_t i0 = face[j], i1 = face[(j+1)%4];
                 if (i0 == i1)
                     continue;
-                uint32_t idx_f = j == 0 ? i : (nF++);
-                if (nF > F.cols())
-                    F.conservativeResize(F.rows(), F.cols() * 2);
-                uint32_t idx_ec0 = idx_ecs[j];
-                uint32_t idx_ec1 = idx_ecs[(j+1)%4];
+                uint32_t idx_ec0 = idx_ecs[j],
+                         idx_ec1 = idx_ecs[(j+1)%4];
+                if (idx_ec0 == INVALID || idx_ec1 == INVALID)
+                    continue;
+                uint32_t idx_f;
+                if (!first) {
+                    idx_f = i;
+                    first = false;
+                } else {
+                    idx_f = nF++;
+                    if (nF > F.cols())
+                        F.conservativeResize(F.rows(), F.cols() * 2);
+                }
                 F.col(idx_f) = Vector4u(idx_ec0, i1, idx_ec1, idx_fc);
             }
         }
