@@ -128,6 +128,14 @@ else()
   #set_target_properties(instant_meshes PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++")
 endif()
 
+if(EXISTS /opt/local/include)
+    add_compile_options(-isystem /opt/local/include) # Make sure we can find tbb with Mac + Macports
+endif()
+
+if(EXISTS /usr/local/include)
+    add_compile_options(-isystem /usr/local/include) # Make sure we can find tbb with Mac + Homebrew
+endif()
+
 target_link_libraries(instant_meshes tbb)
 
 install(TARGETS instant_meshes
