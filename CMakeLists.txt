@@ -90,6 +90,11 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
+include_directories(
+  /opt/local/include # Make sure we can find tbb with Mac + Macports
+  /usr/local/include # Make sure we can find tbb with Mac + Homebrew
+)
+
 if (INSTANT_MESHES_DEV_MODE)
   add_definitions(-DDEV_MODE)
 endif()
@@ -126,14 +131,6 @@ else()
   # Insulate from a few types of ABI changes by statically linking against libgcc and libstdc++
   set_target_properties(instant_meshes PROPERTIES LINK_FLAGS "-static-libgcc")
   #set_target_properties(instant_meshes PROPERTIES LINK_FLAGS "-static-libgcc -static-libstdc++")
-endif()
-
-if(EXISTS /opt/local/include)
-    add_compile_options(-isystem /opt/local/include) # Make sure we can find tbb with Mac + Macports
-endif()
-
-if(EXISTS /usr/local/include)
-    add_compile_options(-isystem /usr/local/include) # Make sure we can find tbb with Mac + Homebrew
 endif()
 
 target_link_libraries(instant_meshes tbb)
