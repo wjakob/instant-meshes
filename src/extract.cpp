@@ -816,7 +816,7 @@ void extract_faces(std::vector<std::vector<TaggedLink> > &adj, MatrixXf &O,
                 if (idx_ec0 == INVALID || idx_ec1 == INVALID)
                     continue;
                 uint32_t idx_f;
-                if (!first) {
+                if (first) {
                     idx_f = i;
                     first = false;
                 } else {
