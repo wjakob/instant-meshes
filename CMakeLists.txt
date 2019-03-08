@@ -198,3 +198,91 @@ endif()
 if (UNIX AND NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEBUG)
   add_custom_command(TARGET InstantMeshes POST_BUILD COMMAND strip $<TARGET_FILE:InstantMeshes>)
 endif()
+
+# Build the library
+
+# Package (pkg-config) Information
+set(PACKAGE_NAME instantmeshes)
+set(PACKAGE_DESCRIPTION "Instant Field-Aligned Meshes")
+set(PACKAGE_URL "https://github.com/wjakob/instant-meshes")
+
+add_library(instantmeshes STATIC src/instantmeshes.cpp)
+set_property(TARGET instantmeshes
+        PROPERTY POSITION_INDEPENDENT_CODE ON
+        )
+
+target_sources(instantmeshes PRIVATE
+  src/meshio.cpp
+  src/normal.cpp
+  src/adjacency.cpp
+  src/meshstats.cpp
+  src/hierarchy.cpp
+  src/extract.cpp
+  src/field.cpp
+  src/bvh.cpp
+  src/subdivide.cpp
+  src/reorder.cpp
+  src/serializer.cpp
+  src/smoothcurve.cpp
+  src/cleanup.cpp
+  src/dedge.cpp
+  ext/rply/rply.c
+  )
+
+set(HEADER_INCLUDES
+  src/aabb.h
+  src/common.h
+  src/meshio.h
+  src/normal.h
+  src/adjacency.h
+  src/meshstats.h
+  src/hierarchy.h
+  src/extract.h
+  src/field.h
+  src/bvh.h
+  src/subdivide.h
+  src/reorder.h
+  src/serializer.h
+  src/smoothcurve.h
+  src/cleanup.h
+  src/dedge.h
+  ext/rply/rply.h
+  )
+
+# Installation
+
+# Pkg-config
+if (UNIX)
+    include(FindPkgConfig QUIET)
+    if (PKG_CONFIG_FOUND)
+        configure_file("instantmeshes.pc.in" "instantmeshes.pc" @ONLY)
+        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/instantmeshes.pc"
+            DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+    endif ()
+endif ()
+
+install(TARGETS instantmeshes
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        COMPONENT libraries
+        )
+
+install(FILES ${HEADER_INCLUDES}
+        DESTINATION include/instantmeshes
+        COMPONENT headers
+        )
+
+# Build Type
+# Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+# Uninstall target
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake)
