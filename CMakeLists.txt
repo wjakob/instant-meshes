@@ -93,11 +93,24 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
 endif()
 
 # Header file directories of dependency libraries
+# find eigen
+# external by default
+# internal if eigen not found
+find_package(Eigen3 QUIET)
+if(NOT Eigen3_FOUND)
+    set(EIGEN_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/eigen")
+else()
+    set(EIGEN_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
+endif()
+
 include_directories(
   # NanoGUI
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/include
   # NanoGUI dependencies (Eigen, GLFW, NanoVG, GLAD?)
-  ${NANOGUI_EXTRA_INCS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/glad/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/glfw/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/nanovg/src
+  ${EIGEN_INCLUDE_DIRS}
   # Intel Thread Building Blocks
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/tbb/include
   # Disjoint set data structure
@@ -149,26 +162,26 @@ endif()
 
 add_executable(InstantMeshes MACOSX_BUNDLE
   resources.cpp
-  src/glutil.h src/glutil.cpp
-  src/widgets.h src/widgets.cpp
-  src/aabb.h
-  src/main.cpp src/common.h
-  src/meshio.h src/meshio.cpp
-  src/normal.h src/normal.cpp
-  src/adjacency.h src/adjacency.cpp
-  src/meshstats.h src/meshstats.cpp
-  src/hierarchy.h src/hierarchy.cpp
-  src/extract.h src/extract.cpp
-  src/viewer.h src/viewer.cpp
-  src/field.h src/field.cpp
-  src/bvh.h src/bvh.cpp
-  src/subdivide.h src/subdivide.cpp
-  src/reorder.h src/reorder.cpp
-  src/serializer.h src/serializer.cpp
-  src/batch.h src/batch.cpp
-  src/smoothcurve.h src/smoothcurve.cpp
-  src/cleanup.h src/cleanup.cpp
-  src/dedge.h src/dedge.cpp
+  instant-meshes/glutil.h instant-meshes/glutil.cpp
+  instant-meshes/widgets.h instant-meshes/widgets.cpp
+  instant-meshes/aabb.h
+  instant-meshes/main.cpp instant-meshes/common.h
+  instant-meshes/meshio.h instant-meshes/meshio.cpp
+  instant-meshes/normal.h instant-meshes/normal.cpp
+  instant-meshes/adjacency.h instant-meshes/adjacency.cpp
+  instant-meshes/meshstats.h instant-meshes/meshstats.cpp
+  instant-meshes/hierarchy.h instant-meshes/hierarchy.cpp
+  instant-meshes/extract.h instant-meshes/extract.cpp
+  instant-meshes/viewer.h instant-meshes/viewer.cpp
+  instant-meshes/field.h instant-meshes/field.cpp
+  instant-meshes/bvh.h instant-meshes/bvh.cpp
+  instant-meshes/subdivide.h instant-meshes/subdivide.cpp
+  instant-meshes/reorder.h instant-meshes/reorder.cpp
+  instant-meshes/serializer.h instant-meshes/serializer.cpp
+  instant-meshes/batch.h instant-meshes/batch.cpp
+  instant-meshes/smoothcurve.h instant-meshes/smoothcurve.cpp
+  instant-meshes/cleanup.h instant-meshes/cleanup.cpp
+  instant-meshes/dedge.h instant-meshes/dedge.cpp
   ext/rply/rply.c
   ${EXTRA_SOURCE})
 
@@ -202,73 +215,85 @@ endif()
 # Build the library
 
 # Package (pkg-config) Information
-set(PACKAGE_NAME instantmeshes)
+set(PACKAGE_NAME instant-meshes)
 set(PACKAGE_DESCRIPTION "Instant Field-Aligned Meshes")
 set(PACKAGE_URL "https://github.com/wjakob/instant-meshes")
 
-add_library(instantmeshes STATIC src/instantmeshes.cpp)
-set_property(TARGET instantmeshes
-        PROPERTY POSITION_INDEPENDENT_CODE ON
-        )
+# Optimize for architecture
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(OptimizeForArchitecture)
+OptimizeForArchitecture()
 
-target_sources(instantmeshes PRIVATE
-  src/meshio.cpp
-  src/normal.cpp
-  src/adjacency.cpp
-  src/meshstats.cpp
-  src/hierarchy.cpp
-  src/extract.cpp
-  src/field.cpp
-  src/bvh.cpp
-  src/subdivide.cpp
-  src/reorder.cpp
-  src/serializer.cpp
-  src/smoothcurve.cpp
-  src/cleanup.cpp
-  src/dedge.cpp
+if (UNIX)
+    set(CMAKE_C_FLAGS_RELEASE "-O3")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+endif ()
+
+set(INSTANTMESHES_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(INSTANTMESHES_LIBRARY instant-meshes)
+add_library(instant-meshes STATIC "")
+set_property(TARGET instant-meshes PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+target_link_libraries(instant-meshes tbb_static pthread dl)
+
+target_sources(instant-meshes PRIVATE
+  instant-meshes/instant-meshes.cpp
+  instant-meshes/meshio.cpp
+  instant-meshes/normal.cpp
+  instant-meshes/adjacency.cpp
+  instant-meshes/meshstats.cpp
+  instant-meshes/hierarchy.cpp
+  instant-meshes/extract.cpp
+  instant-meshes/field.cpp
+  instant-meshes/bvh.cpp
+  instant-meshes/subdivide.cpp
+  instant-meshes/reorder.cpp
+  instant-meshes/serializer.cpp
+  instant-meshes/smoothcurve.cpp
+  instant-meshes/cleanup.cpp
+  instant-meshes/dedge.cpp
   ext/rply/rply.c
   )
 
 set(HEADER_INCLUDES
-  src/aabb.h
-  src/common.h
-  src/meshio.h
-  src/normal.h
-  src/adjacency.h
-  src/meshstats.h
-  src/hierarchy.h
-  src/extract.h
-  src/field.h
-  src/bvh.h
-  src/subdivide.h
-  src/reorder.h
-  src/serializer.h
-  src/smoothcurve.h
-  src/cleanup.h
-  src/dedge.h
+  instant-meshes/aabb.h
+  instant-meshes/common.h
+  instant-meshes/meshio.h
+  instant-meshes/normal.h
+  instant-meshes/adjacency.h
+  instant-meshes/meshstats.h
+  instant-meshes/hierarchy.h
+  instant-meshes/extract.h
+  instant-meshes/field.h
+  instant-meshes/bvh.h
+  instant-meshes/subdivide.h
+  instant-meshes/reorder.h
+  instant-meshes/serializer.h
+  instant-meshes/smoothcurve.h
+  instant-meshes/cleanup.h
+  instant-meshes/dedge.h
   ext/rply/rply.h
   )
 
 # Installation
-
 # Pkg-config
 if (UNIX)
     include(FindPkgConfig QUIET)
     if (PKG_CONFIG_FOUND)
-        configure_file("instantmeshes.pc.in" "instantmeshes.pc" @ONLY)
-        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/instantmeshes.pc"
+        configure_file("instant-meshes.pc.in" "instant-meshes.pc" @ONLY)
+        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/instant-meshes.pc"
             DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
     endif ()
 endif ()
 
-install(TARGETS instantmeshes
+install(TARGETS instant-meshes
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         COMPONENT libraries
         )
 
 install(FILES ${HEADER_INCLUDES}
-        DESTINATION include/instantmeshes
+        DESTINATION include/instant-meshes/instant-meshes
         COMPONENT headers
         )
 
