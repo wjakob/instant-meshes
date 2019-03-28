@@ -8,6 +8,6 @@ Description: @PACKAGE_DESCRIPTION@
 URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
 Requires.private:
-Libs: -L${libdir} -ltbb -linstant-meshes
+Libs: ${libdir}/libtbb-static.a ${libdir}/libinstant-meshes.a
 Cflags: -I${includedir}/instant-meshes -I@EIGEN_INCLUDE_DIRS@
 
