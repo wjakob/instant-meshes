@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.8.3)
 project(InstantMeshes)
 
 option(INSTANT_MESHES_DEV_MODE "Instant meshes developer mode" OFF)
+option(INSTANT_MESHES_BUILD_LIB "Build Instant Meshes library" OFF)
+option(INSTANT_MESHES_BUILD_STATIC "Build Instant Meshes as a static library" OFF)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -16,6 +18,12 @@ if(NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/glfw")
     "You probably did not clone the project with --recursive. It is possible to recover "
     "by calling \"git submodule update --init --recursive\"")
 endif()
+
+# Build Type
+# Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
 
 # Optimize for architecture
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -82,6 +90,7 @@ set(TBB_BUILD_TESTS OFF CACHE BOOL " " FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/tbb ext_build/tbb)
 set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
+set_property(TARGET tbb_static PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # Compile instant meshes with various compiler warnings turned on
 if(MSVC)
@@ -218,86 +227,86 @@ if (UNIX AND NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEBUG)
   add_custom_command(TARGET InstantMeshes POST_BUILD COMMAND strip $<TARGET_FILE:InstantMeshes>)
 endif()
 
+#
 # Build the library
+#
+if (INSTANT_MESHES_BUILD_LIB)
+  # Package (pkg-config) Information
+  set(PACKAGE_NAME instant-meshes)
+  set(PACKAGE_DESCRIPTION "Instant Field-Aligned Meshes")
+  set(PACKAGE_URL "https://github.com/wjakob/instant-meshes")
 
-# Package (pkg-config) Information
-set(PACKAGE_NAME instant-meshes)
-set(PACKAGE_DESCRIPTION "Instant Field-Aligned Meshes")
-set(PACKAGE_URL "https://github.com/wjakob/instant-meshes")
+  if (INSTANT_MESHES_BUILD_STATIC)
+    add_library(instant-meshes STATIC "")
+  else()
+    add_library(instant-meshes SHARED "")
+  endif()
 
-set(INSTANTMESHES_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(INSTANTMESHES_LIBRARY instant-meshes)
-add_library(instant-meshes STATIC "")
-set_property(TARGET instant-meshes PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-target_link_libraries(instant-meshes tbb_static pthread dl)
-
-target_sources(instant-meshes PRIVATE
-  instant-meshes/instant-meshes.cpp
-  instant-meshes/meshio.cpp
-  instant-meshes/normal.cpp
-  instant-meshes/adjacency.cpp
-  instant-meshes/meshstats.cpp
-  instant-meshes/hierarchy.cpp
-  instant-meshes/extract.cpp
-  instant-meshes/field.cpp
-  instant-meshes/bvh.cpp
-  instant-meshes/subdivide.cpp
-  instant-meshes/reorder.cpp
-  instant-meshes/serializer.cpp
-  instant-meshes/smoothcurve.cpp
-  instant-meshes/cleanup.cpp
-  instant-meshes/dedge.cpp
-  ext/rply/rply.c
-  )
-
-set(HEADER_INCLUDES
-  instant-meshes/aabb.h
-  instant-meshes/common.h
-  instant-meshes/meshio.h
-  instant-meshes/normal.h
-  instant-meshes/adjacency.h
-  instant-meshes/meshstats.h
-  instant-meshes/hierarchy.h
-  instant-meshes/extract.h
-  instant-meshes/field.h
-  instant-meshes/bvh.h
-  instant-meshes/subdivide.h
-  instant-meshes/reorder.h
-  instant-meshes/serializer.h
-  instant-meshes/smoothcurve.h
-  instant-meshes/cleanup.h
-  instant-meshes/dedge.h
-  ext/rply/rply.h
-  )
-
-# Installation
-# Pkg-config
-if (UNIX)
-    include(FindPkgConfig QUIET)
-    if (PKG_CONFIG_FOUND)
-        configure_file("instant-meshes.pc.in" "instant-meshes.pc" @ONLY)
-        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/instant-meshes.pc"
-            DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
-    endif ()
-endif ()
-
-install(TARGETS instant-meshes
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        COMPONENT libraries
-        )
-
-install(FILES ${HEADER_INCLUDES}
-        DESTINATION include/instant-meshes/instant-meshes
-        COMPONENT headers
-        )
-
-# Build Type
-# Set default build type to Release
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
+  set_property(TARGET instant-meshes PROPERTY POSITION_INDEPENDENT_CODE ON)
+  
+  target_link_libraries(instant-meshes tbb_static pthread dl)
+  
+  target_sources(instant-meshes PRIVATE
+    instant-meshes/instant-meshes.cpp
+    instant-meshes/meshio.cpp
+    instant-meshes/normal.cpp
+    instant-meshes/adjacency.cpp
+    instant-meshes/meshstats.cpp
+    instant-meshes/hierarchy.cpp
+    instant-meshes/extract.cpp
+    instant-meshes/field.cpp
+    instant-meshes/bvh.cpp
+    instant-meshes/subdivide.cpp
+    instant-meshes/reorder.cpp
+    instant-meshes/serializer.cpp
+    instant-meshes/smoothcurve.cpp
+    instant-meshes/cleanup.cpp
+    instant-meshes/dedge.cpp
+    ext/rply/rply.c
+    )
+  
+  set(HEADER_INCLUDES
+    instant-meshes/aabb.h
+    instant-meshes/common.h
+    instant-meshes/meshio.h
+    instant-meshes/normal.h
+    instant-meshes/adjacency.h
+    instant-meshes/meshstats.h
+    instant-meshes/hierarchy.h
+    instant-meshes/extract.h
+    instant-meshes/field.h
+    instant-meshes/bvh.h
+    instant-meshes/subdivide.h
+    instant-meshes/reorder.h
+    instant-meshes/serializer.h
+    instant-meshes/smoothcurve.h
+    instant-meshes/cleanup.h
+    instant-meshes/dedge.h
+    ext/rply/rply.h
+    )
+  
+  # Installation
+  # Pkg-config
+  if (UNIX)
+      include(FindPkgConfig QUIET)
+      if (PKG_CONFIG_FOUND)
+          configure_file("instant-meshes.pc.in" "instant-meshes.pc" @ONLY)
+          install(FILES "${CMAKE_CURRENT_BINARY_DIR}/instant-meshes.pc"
+              DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+      endif ()
+  endif ()
+  
+  install(TARGETS instant-meshes
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib
+          COMPONENT libraries
+          )
+  
+  install(FILES ${HEADER_INCLUDES}
+          DESTINATION include/instant-meshes/instant-meshes
+          COMPONENT headers
+          )
+endif()
 
 # Uninstall target
 configure_file(
