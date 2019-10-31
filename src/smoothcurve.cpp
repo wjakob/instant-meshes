@@ -163,7 +163,7 @@ inline bool astar(const MatrixXu &F, const VectorXu &E2E, const MatrixXf &V, uin
     auto eucldist = [&](uint32_t i, uint32_t j) -> Float {
         Vector3f diff;
         for (uint32_t k=0; k<3; ++k)
-            diff = V.col(F(k, i)) - V.col(F(k, j));
+            diff += V.col(F(k, i)) - V.col(F(k, j));
         return diff.norm() * (1.0f / 3.0f);
     };
 
