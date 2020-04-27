@@ -2,7 +2,7 @@ Makefile
 *.cmake
 .DS_Store
 ext_build
-build
+build*
 Release
 Debug
 CMakeCache.txt
