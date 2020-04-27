@@ -91,9 +91,9 @@ include_directories(
 )
 
 include_directories(
+  ${TBB_INCLUDE_DIR} # Allow for extra include paths (ios builds tbb in 3rdparty)
   /opt/local/include # Make sure we can find tbb with Mac + Macports
   /usr/local/include # Make sure we can find tbb with Mac + Homebrew
-  ${TBB_INCLUDE_DIR} # Allow for extra include paths (ios builds tbb in 3rdparty)
 )
 
 if (INSTANT_MESHES_DEV_MODE)
