@@ -21,3 +21,5 @@ datasets
 *.filters
 *.sdf
 *.sln
+*.user
+_Resharper*

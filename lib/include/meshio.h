@@ -23,6 +23,10 @@ load_mesh_or_pointcloud(const std::string &filename, MatrixXu &F,
 extern void load_obj(const std::string &filename, MatrixXu &F, MatrixXf &V,
                      const ProgressCallback &progress = ProgressCallback());
 
+extern void load_obj_pure_quad(const std::string& filename,
+                               MatrixXu& F, MatrixXf& V, MatrixXf& N,
+                               const ProgressCallback& progress = ProgressCallback());
+
 extern void load_ply(const std::string &filename, MatrixXu &F, MatrixXf &V,
                      MatrixXf &N, bool pointcloud = false,
                      const ProgressCallback &progress = ProgressCallback());

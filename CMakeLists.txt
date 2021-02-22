@@ -147,33 +147,41 @@ elseif(WIN32)
   set(EXTRA_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/resources/im.rc")
 endif()
 
+add_library(InstantMeshesLib 
+  lib/include/common.h
+  lib/include/aabb.h
+  lib/include/meshio.h lib/src/meshio.cpp
+  lib/include/bvh.h lib/src/bvh.cpp
+  lib/include/smoothing.h lib/src/smoothing.cpp
+  lib/include/normal.h lib/src/normal.cpp
+  lib/include/dedge.h lib/src/dedge.cpp)
+  
+target_include_directories(InstantMeshesLib PRIVATE lib/include)
+
 add_executable(InstantMeshes MACOSX_BUNDLE
   resources.cpp
   src/glutil.h src/glutil.cpp
   src/widgets.h src/widgets.cpp
-  src/aabb.h
-  src/main.cpp src/common.h
-  src/meshio.h src/meshio.cpp
-  src/normal.h src/normal.cpp
+  src/main.cpp
   src/adjacency.h src/adjacency.cpp
   src/meshstats.h src/meshstats.cpp
   src/hierarchy.h src/hierarchy.cpp
   src/extract.h src/extract.cpp
   src/viewer.h src/viewer.cpp
   src/field.h src/field.cpp
-  src/bvh.h src/bvh.cpp
   src/subdivide.h src/subdivide.cpp
   src/reorder.h src/reorder.cpp
   src/serializer.h src/serializer.cpp
   src/batch.h src/batch.cpp
   src/smoothcurve.h src/smoothcurve.cpp
   src/cleanup.h src/cleanup.cpp
-  src/dedge.h src/dedge.cpp
   ext/rply/rply.c
   ${EXTRA_SOURCE})
+  
+target_include_directories(InstantMeshes PRIVATE lib/include)
 
 add_definitions(${NANOGUI_EXTRA_DEFS})
-target_link_libraries(InstantMeshes tbb_static nanogui ${NANOGUI_EXTRA_LIBS})
+target_link_libraries(InstantMeshes InstantMeshesLib tbb_static nanogui ${NANOGUI_EXTRA_LIBS})
 
 set_target_properties(InstantMeshes PROPERTIES OUTPUT_NAME "Instant Meshes")
 

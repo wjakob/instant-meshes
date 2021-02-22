@@ -326,50 +326,49 @@ void write_ply(const std::string &filename, const MatrixXu &F,
     cout << "took " << timeString(timer.value()) << ")" << endl;
 }
 
+/// Vertex indices used by the OBJ format
+struct obj_vertex {
+    uint32_t p = (uint32_t) -1;
+    uint32_t n = (uint32_t) -1;
+    uint32_t uv = (uint32_t) -1;
+
+    inline obj_vertex() { }
+
+    inline obj_vertex(const std::string &string) {
+        std::vector<std::string> tokens = str_tokenize(string, '/', true);
+
+        if (tokens.size() < 1 || tokens.size() > 3)
+            throw std::runtime_error("Invalid vertex data: \"" + string + "\"");
+
+        p = str_to_uint32_t(tokens[0]);
+
+        //if(tokens.size() >= 2 && !tokens[1].empty())
+        //    uv = str_to_uint32_t(tokens[1]);
+
+        if(tokens.size() >= 3 && !tokens[2].empty())
+            n = str_to_uint32_t(tokens[2]);
+    }
+
+    inline bool operator==(const obj_vertex &v) const {
+        return v.p == p /*&& v.n == n && v.uv == uv*/;
+    }
+};
+
+/// Hash function for obj_vertex
+struct obj_vertexHash : std::unary_function<obj_vertex, size_t> {
+    std::size_t operator()(const obj_vertex &v) const {
+        size_t hash = std::hash<uint32_t>()(v.p);
+        //hash = hash * 37 + std::hash<uint32_t>()(v.uv);
+        //hash = hash * 37 + std::hash<uint32_t>()(v.n);
+        return hash;
+    }
+};
+
+typedef std::unordered_map<obj_vertex, uint32_t, obj_vertexHash> VertexMap;
+
 void load_obj(const std::string &filename, MatrixXu &F, MatrixXf &V,
               const ProgressCallback &progress) {
-    /// Vertex indices used by the OBJ format
-    struct obj_vertex {
-        uint32_t p = (uint32_t) -1;
-        uint32_t n = (uint32_t) -1;
-        uint32_t uv = (uint32_t) -1;
-
-        inline obj_vertex() { }
-
-        inline obj_vertex(const std::string &string) {
-            std::vector<std::string> tokens = str_tokenize(string, '/', true);
-
-            if (tokens.size() < 1 || tokens.size() > 3)
-                throw std::runtime_error("Invalid vertex data: \"" + string + "\"");
-
-            p = str_to_uint32_t(tokens[0]);
-
-            #if 0
-                if (tokens.size() >= 2 && !tokens[1].empty())
-                    uv = str_to_uint32_t(tokens[1]);
-
-                if (tokens.size() >= 3 && !tokens[2].empty())
-                    n = str_to_uint32_t(tokens[2]);
-            #endif
-        }
-
-        inline bool operator==(const obj_vertex &v) const {
-            return v.p == p && v.n == n && v.uv == uv;
-        }
-    };
-
-    /// Hash function for obj_vertex
-    struct obj_vertexHash : std::unary_function<obj_vertex, size_t> {
-        std::size_t operator()(const obj_vertex &v) const {
-            size_t hash = std::hash<uint32_t>()(v.p);
-            hash = hash * 37 + std::hash<uint32_t>()(v.uv);
-            hash = hash * 37 + std::hash<uint32_t>()(v.n);
-            return hash;
-        }
-    };
-
-    typedef std::unordered_map<obj_vertex, uint32_t, obj_vertexHash> VertexMap;
-
+	
     std::ifstream is(filename);
     if (is.fail())
         throw std::runtime_error("Unable to open OBJ file \"" + filename + "\"!");
@@ -378,8 +377,6 @@ void load_obj(const std::string &filename, MatrixXu &F, MatrixXf &V,
     Timer<> timer;
 
     std::vector<Vector3f>   positions;
-    //std::vector<Vector2f>   texcoords;
-    //std::vector<Vector3f>   normals;
     std::vector<uint32_t>   indices;
     std::vector<obj_vertex> vertices;
     VertexMap vertexMap;
@@ -448,6 +445,94 @@ void load_obj(const std::string &filename, MatrixXu &F, MatrixXf &V,
 
     cout << "done. (V=" << V.cols() << ", F=" << F.cols() << ", took "
          << timeString(timer.value()) << ")" << endl;
+}
+
+void load_obj_pure_quad(const std::string& filename,
+                        MatrixXu& F, MatrixXf& V, MatrixXf& N,
+                        const ProgressCallback& progress) {
+
+    std::ifstream is(filename);
+    if(is.fail())
+        throw std::runtime_error("Unable to open OBJ file \"" + filename + "\"!");
+    cout << "Loading \"" << filename << "\" .. ";
+    cout.flush();
+    Timer<> timer;
+
+    std::vector<Vector3f>   positions;
+    //std::vector<Vector2f>   texcoords;
+    std::vector<Vector3f>   normals;
+    std::vector<uint32_t>   indices;
+    std::vector<obj_vertex> vertices;
+    VertexMap vertexMap;
+
+    std::string line_str;
+    while(std::getline(is, line_str)) {
+        std::istringstream line(line_str);
+
+        std::string prefix;
+        line >> prefix;
+
+        if(prefix == "v") {
+            Vector3f p;
+            line >> p.x() >> p.y() >> p.z();
+            positions.push_back(p);
+        }
+        else if(prefix == "vt") {
+            /*
+            Vector2f tc;
+            line >> tc.x() >> tc.y();
+            texcoords.push_back(tc);
+            */
+        }
+        else if(prefix == "vn") {
+            Vector3f n;
+            line >> n.x() >> n.y() >> n.z();
+            normals.push_back(n);
+        }
+        else if(prefix == "f") {
+            std::string v1, v2, v3, v4;
+            line >> v1 >> v2 >> v3 >> v4;
+            obj_vertex tri[4];
+            int nVertices = 4;
+
+
+            tri[0] = v1; tri[1] = v2; tri[2] = v3; tri[3] = v4;
+
+            /* Convert to an indexed vertex list */
+            for(int i = 0; i < nVertices; ++i) {
+                const obj_vertex& v = tri[i];
+                VertexMap::const_iterator it = vertexMap.find(v);
+                if(it == vertexMap.end()) {
+                    vertexMap[v] = (uint32_t)vertices.size();
+                    indices.push_back((uint32_t)vertices.size());
+                    vertices.push_back(v);
+                }
+                else {
+                    indices.push_back(it->second);
+                }
+            }
+            
+        }
+    }
+
+    F.resize(4, indices.size() / 4);
+    memcpy(F.data(), indices.data(), sizeof(uint32_t) * indices.size());
+
+    auto normalsEmpty = normals.empty();
+	
+    V.resize(3, vertices.size());
+    if(!normalsEmpty)
+		N.resize(3, vertices.size());
+	
+    for(uint32_t i = 0; i < vertices.size(); ++i)
+    {
+        V.col(i) = positions.at(vertices[i].p - 1);
+        if(!normalsEmpty)
+			N.col(i) = normals.at(vertices[i].n - 1);
+    }
+    
+    cout << "done. (V=" << V.cols() << ", F=" << F.cols() << ", took "
+        << timeString(timer.value()) << ")" << endl;
 }
 
 void load_pointcloud(const std::string &filename, MatrixXf &V, MatrixXf &N,
@@ -588,7 +673,10 @@ void write_obj(const std::string &filename, const MatrixXu &F,
             os << idx;
             if (Nf.size() > 0)
                 idx = f + 1;
-            os << "//" << idx << " ";
+            if (N.size() > 0 || Nf.size() > 0)
+                os << "//" << idx << " ";
+            else
+                os << " ";
         }
         os << endl;
     }
@@ -602,7 +690,10 @@ void write_obj(const std::string &filename, const MatrixXu &F,
             os << idx;
             if (Nf.size() > 0)
                 idx = face.first + 1;
-            os << "//" << idx << " ";
+        	if (N.size() > 0 || Nf.size() > 0)
+				os << "//" << idx << " ";
+            else
+                os << " ";
 
             v = face.second[v];
             if (v == first || ++i == face.second.size())
