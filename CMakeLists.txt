@@ -154,7 +154,17 @@ add_library(InstantMeshesLib
   lib/include/bvh.h lib/src/bvh.cpp
   lib/include/smoothing.h lib/src/smoothing.cpp
   lib/include/normal.h lib/src/normal.cpp
-  lib/include/dedge.h lib/src/dedge.cpp)
+  lib/include/dedge.h lib/src/dedge.cpp
+  lib/include/batch.h lib/src/batch.cpp
+  lib/include/subdivide.h lib/src/subdivide.cpp
+  lib/include/meshstats.h lib/src/meshstats.cpp
+  lib/include/hierarchy.h lib/src/hierarchy.cpp
+  lib/include/adjacency.h lib/src/adjacency.cpp
+  lib/include/serializer.h lib/src/serializer.cpp
+  lib/include/field.h lib/src/field.cpp
+  lib/include/extract.h lib/src/extract.cpp
+  lib/include/reorder.h lib/src/reorder.cpp
+  lib/include/cleanup.h lib/src/cleanup.cpp)
   
 target_include_directories(InstantMeshesLib PRIVATE lib/include)
 
@@ -163,18 +173,8 @@ add_executable(InstantMeshes MACOSX_BUNDLE
   src/glutil.h src/glutil.cpp
   src/widgets.h src/widgets.cpp
   src/main.cpp
-  src/adjacency.h src/adjacency.cpp
-  src/meshstats.h src/meshstats.cpp
-  src/hierarchy.h src/hierarchy.cpp
-  src/extract.h src/extract.cpp
   src/viewer.h src/viewer.cpp
-  src/field.h src/field.cpp
-  src/subdivide.h src/subdivide.cpp
-  src/reorder.h src/reorder.cpp
-  src/serializer.h src/serializer.cpp
-  src/batch.h src/batch.cpp
   src/smoothcurve.h src/smoothcurve.cpp
-  src/cleanup.h src/cleanup.cpp
   ext/rply/rply.c
   ${EXTRA_SOURCE})
   
