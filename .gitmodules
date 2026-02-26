@@ -1,6 +1,6 @@
 [submodule "ext/nanogui"]
 	path = ext/nanogui
-	url = https://github.com/wjakob/nanogui
+	url = https://github.com/AngryAnt3201/nanogui
 [submodule "ext/pcg32"]
 	path = ext/pcg32
 	url = https://github.com/wjakob/pcg32
