@@ -25,6 +25,13 @@
 #include <pcg32.h>
 #include <fstream>
 
+#ifdef __APPLE__
+#  include "native_file_dialog.h"
+#  define im_file_dialog native_file_dialog
+#else
+#  define im_file_dialog nanogui::file_dialog
+#endif
+
 #if !defined(_WIN32)
 #  include <unistd.h>
 #  include <sys/wait.h>
@@ -595,7 +602,7 @@ Viewer::Viewer(bool fullscreen, bool deterministic)
     mSaveBtn->setId("saveMeshBtn");
     mSaveBtn->setCallback([&]() {
         try {
-            std::string filename = nanogui::file_dialog({
+            std::string filename = im_file_dialog({
                 {"obj", "Wavefront OBJ"},
                 {"ply", "Stanford PLY"}
             }, true);
@@ -1891,7 +1898,7 @@ void Viewer::refreshColors() {
 
 void Viewer::saveState(std::string filename) {
     if (filename.empty()) {
-        filename = nanogui::file_dialog({{"ply", "Stanford PLY"}}, true);
+        filename = im_file_dialog({{"ply", "Stanford PLY"}}, true);
 
         if (filename == "")
             return;
@@ -2012,7 +2019,7 @@ void Viewer::saveState(std::string filename) {
 
 void Viewer::loadState(std::string filename, bool compat) {
     if (filename.empty()) {
-        filename = nanogui::file_dialog({{"ply", "Stanford PLY"}}, false);
+        filename = im_file_dialog({{"ply", "Stanford PLY"}}, false);
         if (filename == "")
             return;
     }
@@ -3039,7 +3046,7 @@ void Viewer::loadInput(std::string filename, Float creaseAngle, Float scale,
         extension = str_tolower(filename.substr(filename.size()-4));
 
     if (filename.empty()) {
-        filename = nanogui::file_dialog({
+        filename = im_file_dialog({
             {"obj", "Wavefront OBJ"},
             {"ply", "Stanford PLY"},
             {"aln", "Aligned point cloud"}
