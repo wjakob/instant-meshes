@@ -1,0 +1,57 @@
+# Instant Meshes Modernization Progress Log
+
+## 2026-09-27
+
+### 16:00-16:30 - Initial Investigation & Planning
+- Investigated Instant Meshes crash on "Open Mesh" button
+- Found root cause: nanogui::file_dialog uses zenity via popen() which crashes on KDE Plasma Wayland
+- Analyzed 3 coredumps - all show SIGABRT in fgets() from zenity pipe
+- Created plan for two approaches: binary patch (quick) vs source fix (upstream)
+
+### 16:30-17:00 - Source Code Analysis
+- Cloned instant-meshes repo from GitHub
+- Found existing PR #173 for macOS native file dialog (osascript)
+- Located nanogui::file_dialog in ext/nanogui/src/common.cpp (lines 194-267)
+- Identified hardcoded zenity command at binary offset 0x1e8f84
+
+### 17:00-17:30 - Binary Patch Attempt
+- Created zenity wrapper script in ~/bin/zenity with GDK_BACKEND=x11
+- Tested - still crashed because backgrounded processes don't propagate env vars to popen()
+- Created binary patch plan: replace /usr/bin/zenity with kdialog wrapper
+
+### 17:30-18:00 - Source Fix Decision
+- User preferred source fix for upstream contribution
+- Merged PR #173 (macOS native dialog)
+- Extended native_file_dialog.cpp/h for Linux kdialog support
+- Updated CMakeLists.txt for Linux builds
+
+### 18:00-18:30 - CMake Modernization (Phase 1)
+- Updated root CMakeLists.txt to 3.15, C++17, find_package for Eigen/TBB/GLFW
+- Modernized ext/nanogui/CMakeLists.txt to 3.15, removed CMP0042, use system deps
+- Removed bundled TBB/GLFW/Eigen submodules in favor of system packages
+
+### 18:30-19:00 - Code Fixes (Phase 3) - In Progress
+- Added #include <cassert> to 6 NanoGUI source files (widget.cpp, stackedwidget.cpp, tabwidget.cpp, tabheader.cpp, imageview.cpp)
+- Fixed Eigen API issues: Vector2i / float → .cast<float>()
+- Added warning suppressions for stringop-overflow, int-in-bool-context, dangling-pointer
+- Fixed TBB -Wchanges-meaning by using system TBB
+
+### Next Steps (19:00+)
+- Clean build and test
+- Verify native_file_dialog works on KDE
+- Test all file dialog operations (Open, Save, Load State, Save State)
+- Prepare upstream PRs
+
+## Files Modified
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/CMakeLists.txt (root)
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/CMakeLists.txt
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/src/native_file_dialog.h
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/src/native_file_dialog.cpp
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/widget.cpp
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/stackedwidget.cpp
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/tabwidget.cpp
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/tabheader.cpp
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/imageview.cpp
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/screen.cpp (Eigen fixes)
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/window.cpp (Eigen fixes)
+- /mnt/VG_00/PUBLIC-LIBRARY/GIT/instant-meshes/ext/nanogui/src/imageview.cpp (Eigen fixes)

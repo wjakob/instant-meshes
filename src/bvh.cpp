@@ -12,6 +12,7 @@
 */
 
 #include "bvh.h"
+#include <cassert>
 
 struct Bins {
     static const int BIN_COUNT = 8;

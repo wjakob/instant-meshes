@@ -1,5 +1,5 @@
 version: 1.0.{build}
-os: Visual Studio 2015
+image: Visual Studio 2022
 test: off
 clone_folder: C:\projects\InstantMeshes
 branches:
@@ -7,17 +7,14 @@ branches:
     - master
 install:
   - git submodule update --init --recursive
-  - cinstall: python
+  - cd C:\Tools\vcpkg
+  - if not exist vcpkg.exe call bootstrap-vcpkg.bat -disableMetrics
+  - vcpkg install eigen3:x64-windows-static glfw3:x64-windows-static
 build_script:
-  - echo Running cmake...
-  - cd c:\projects\InstantMeshes
-  - cmake -G "Visual Studio 14 2015 Win64"
-  - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-  - set MSBuildOptions=/v:m /p:Configuration=Release /logger:%MSBuildLogger%
-  - msbuild %MSBuildOptions% InstantMeshes.sln
-  - cd Release
-  - 7z a ../instant-meshes-windows.zip "Instant Meshes.exe"
-  - cd ..
+  - cd C:\projects\InstantMeshes
+  - cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+  - cmake --build build --config Release -- /m
+  - 7z a instant-meshes-windows.zip "build\Release\Instant Meshes.exe"
   - appveyor PushArtifact instant-meshes-windows.zip -FileName instant-meshes-windows.zip
 deploy:
   provider: S3
@@ -27,4 +24,4 @@ deploy:
     secure: Vy3I/MR5NtWDTXLbHcUzS6cwCSKZa/M8JYQZwHrip7cVW50Aez239OeqpC2je9yd
   bucket: instant-meshes
   set_public: true
-  folder: Release
+  folder: build\Release
